@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const passport = require('passport');
 const prisma = new PrismaClient();
+const bcrypt = require('bcryptjs');
 
 const createUserGet = (req, res) => {
   res.render('signup');
@@ -8,18 +9,23 @@ const createUserGet = (req, res) => {
 
 // TODO: add more fields for email, first name, last name,
 // TODO: add validation
-// TODO: add password encryption
 const createUserPost = async (req, res) => {
-  const { username, password, confirmPassword } = req.body;
+  const { username, password } = req.body;
 
-  const user = await prisma.user.create({
-    data: {
-      username,
-      password,
-    }
-  });
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  res.redirect('/');
+  try {
+    const user = await prisma.user.create({
+      data: {
+        username,
+        password: hashedPassword,
+      }
+    });
+
+    res.redirect('/');
+  } catch (error) {
+    res.status(400).send('User already exists');
+  }
 }
 
 const homePageGet = (req, res) => {

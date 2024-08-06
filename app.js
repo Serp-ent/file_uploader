@@ -4,6 +4,7 @@ const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
 
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -31,8 +32,7 @@ passport.use(new LocalStrategy(
         return done(null, false, { message: "Incorrect credentials" });
       }
 
-      // TODO: change to bcrypt
-      const match = password === user.password;
+      const match = await bcrypt.compare(password, user.password);
       if (!match) {
         return done(null, false, { message: "Incorrect credentials" });
       }
