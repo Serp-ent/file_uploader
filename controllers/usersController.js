@@ -12,22 +12,46 @@ const createUserPost = async (req, res) => {
   const { username, password } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
   try {
     const user = await prisma.user.create({
       data: {
         username,
         password: hashedPassword,
+        files: {
+          create: {
+            name: 'root',
+            type: 'FOLDER',
+          }
+        }
       }
     });
 
     res.redirect('/');
   } catch (error) {
+    console.log(error);
     res.status(400).send('User already exists');
   }
 }
 
-const homePageGet = (req, res) => {
+const homePageGet = async (req, res) => {
+  res.locals.files = null;
+  if (req.user) {
+
+    const rootFolder = await prisma.file.findFirst({
+      where: {
+        userId: req.user.id,
+        type: "FOLDER",
+        parentId: null,
+      }
+    });
+
+    res.locals.files = await prisma.file.findMany({
+      where: {
+        parentId: rootFolder.id,
+      }
+    });
+  }
+
   res.render('index');
 }
 

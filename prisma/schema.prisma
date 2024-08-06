@@ -17,6 +17,7 @@ model User {
   id       Int    @id @default(autoincrement())
   username String @unique
   password String
+  files    File[]
 }
 
 model Session {
@@ -24,4 +25,23 @@ model Session {
   sid       String   @unique
   data      String
   expiresAt DateTime
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  type      FileType
+  parentId  Int? // Only used if this item is a sub-item (null if it's a root item)
+  parent    File?    @relation("ItemHierarchy", fields: [parentId], references: [id])
+  children  File[]   @relation("ItemHierarchy")
+  path      String? // Only used for files (null if it's a folder)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+enum FileType {
+  FOLDER
+  FILE
 }
