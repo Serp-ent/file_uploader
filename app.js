@@ -5,9 +5,10 @@ const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
-
+const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+
+const prisma = require('./db/prismaClient');
 
 const app = express();
 
@@ -18,6 +19,15 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+
+  store: new PrismaSessionStore(prisma,
+    {
+      checkPeriod: 2 * 60 * 1000,  //ms
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }
+  ),
+
 }))
 app.use(passport.session());
 
