@@ -36,6 +36,9 @@
     <a href="/files/folder/<%=file.id%>">Open</a>
     <%} else {%>
     <a href="/files/<%=file.id%>">Info</a>
+    <form method="POST" action="/files/share/<%=file.id%>">
+      <button type="submit">Share</button>
+    </form>
     <%}%>
 
 

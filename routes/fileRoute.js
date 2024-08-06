@@ -2,6 +2,7 @@ const { Router } = require('express');
 const fs = require('fs');
 const multer = require('multer');
 const prisma = require('../db/prismaClient');
+const { randomUUID } = require('crypto');
 const upload = multer({ dest: "uploads/" });
 
 const fileRouter = Router();
@@ -14,7 +15,6 @@ fileRouter.get('/:id', async (req, res) => {
     }
   });
 
-  console.log(file);
   res.render('fileInfo', { file });
 })
 
@@ -161,7 +161,60 @@ fileRouter.get("/:id/download", async (req, res) => {
   } else {
     res.status(404).send('File not found on the server');
   }
+});
 
+fileRouter.post('/share/:id', async (req, res) => {
+  const fileId = Number(req.params.id)
+
+  try {
+    const today = new Date();
+    const expiresAt = new Date(today);
+    expiresAt.setDate(today.getDate() + 1);
+
+    const shareLink = await prisma.shareLink.create({
+      data: {
+        linkId: randomUUID(),
+        fileId,
+        expiresAt,
+      }
+    });
+
+    const shareUrl = `https://localhost/share/${shareLink.linkId}`
+    res.json({ shareUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error creating share link');
+  }
+});
+
+fileRouter.get('/share/:linkId', async (req, res) => {
+  const { linkId } = req.params;
+
+  try {
+    const shareLink = await prisma.shareLink.findUnique({
+      where: { linkId },
+      include: { file: true },
+    });
+
+    if (!shareLink || new Date(shareLink.expiresAt) < new Date()) {
+      return res.status(404).send("Share link expired or not found");;
+    }
+
+    // fetch folder contants
+    const folder = await prisma.file.findUnique({
+      where: { id: shareLink.fileId },
+      include: { children: true },
+    });
+
+    if (!folder) {
+      return res.status(404).send('Folder not found');
+    }
+
+    res.json(folder);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error creating share link');
+  }
 });
 
 module.exports = fileRouter;

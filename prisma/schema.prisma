@@ -28,17 +28,26 @@ model Session {
 }
 
 model File {
+  id          Int         @id @default(autoincrement())
+  name        String
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  type        FileType
+  parentId    Int? // Only used if this item is a sub-item (null if it's a root item)
+  parent      File?       @relation("ItemHierarchy", fields: [parentId], references: [id])
+  children    File[]      @relation("ItemHierarchy")
+  path        String? // Only used for files (null if it's a folder)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt()
+  sharedLinks ShareLink[]
+}
+
+model ShareLink {
   id        Int      @id @default(autoincrement())
-  name      String
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  type      FileType
-  parentId  Int? // Only used if this item is a sub-item (null if it's a root item)
-  parent    File?    @relation("ItemHierarchy", fields: [parentId], references: [id])
-  children  File[]   @relation("ItemHierarchy")
-  path      String? // Only used for files (null if it's a folder)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  linkId    String   @unique
+  fileId    Int
+  expiresAt DateTime
+  File      File     @relation(fields: [fileId], references: [id])
 }
 
 enum FileType {
