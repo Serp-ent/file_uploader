@@ -9,12 +9,12 @@
 
 <body>
   <% if (user) { %>
-  <p>Logged in</p>
+  <p>Logged in as <%=user.username %></p>
   <form method="POST" action="/logout">
     <button type="submit">Logout</button>
   </form>
 
-  <form method="POST">
+  <form method="POST" action="/files/createFolder">
     <input type="text" name="folderName">
     <button>Create Folder</button>
   </form>
@@ -29,16 +29,19 @@
 
   <% files.forEach(file => {%>
   <div style="border: 1px solid black;">
-    <h2><%= file.id %> <%= file.name %></h2>
+    <h2><%= file.id %> <%= file.name %> <%= (file.type === 'FOLDER') ? 'DIRECTORY' : ""%></h2>
     Created at: <%= file.createdAt %>
+    <% if (file.type === 'FOLDER') {%>
+    <a href="/folder/<%=file.id%>">Open</a>
+    <%}%>
   </div>
   <%});%>
 
-  <%} else {%>
-  <p>Not logged in</p>
-  <a href="/login">Login</a>
-  <a href="/signup">Register</a>
-  <%}%>
+    <%} else {%>
+    <p>Not logged in</p>
+    <a href="/login">Login</a>
+    <a href="/signup">Register</a>
+    <%}%>
   
 </body>
 </html>

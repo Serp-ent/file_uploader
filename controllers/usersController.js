@@ -36,7 +36,6 @@ const createUserPost = async (req, res) => {
 const homePageGet = async (req, res) => {
   res.locals.files = null;
   if (req.user) {
-
     const rootFolder = await prisma.file.findFirst({
       where: {
         userId: req.user.id,
@@ -50,6 +49,8 @@ const homePageGet = async (req, res) => {
         parentId: rootFolder.id,
       }
     });
+
+    console.log(res.locals.files);
   }
 
   res.render('index');
