@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const fs = require('fs');
 const multer = require('multer');
 const prisma = require('../db/prismaClient');
 const upload = multer({ dest: "uploads/" });
@@ -79,7 +80,6 @@ fileRouter.post('/folder/:id',
         type: "FOLDER",
       }
     });
-    console.log(directory);
 
     const newItem = await prisma.file.create({
       data: {
@@ -94,5 +94,36 @@ fileRouter.post('/folder/:id',
     res.redirect(`/files/folder/${req.params.id}`);
   }
 );
+
+fileRouter.post("/:id/delete", async (req, res) => {
+  // remove that file
+  const file = await prisma.file.findUnique({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
+
+  if (!file) {
+    return res.status(404).send('File not found');
+  }
+
+  // remove from db
+  await prisma.file.delete({
+    where: {
+      id: file.id,
+    },
+  });
+
+  if (file.type === 'FILE' && file.path) {
+    // remove from filesystem
+    fs.unlink(file.path, async (err) => {
+      if (err) {
+        return res.status(500).send('Error deleting the file', err);
+      }
+    });
+  }
+
+  res.redirect(`/files/folder/${file.parentId}`);
+});
 
 module.exports = fileRouter;

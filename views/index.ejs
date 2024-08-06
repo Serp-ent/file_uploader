@@ -35,14 +35,19 @@
     <% if (file.type === 'FOLDER') {%>
     <a href="/files/folder/<%=file.id%>">Open</a>
     <%}%>
+
+    <form method="POST" action="/files/<%=file.id%>/delete">
+    <button type="submit">Delete</button>
+    </form>
+
   </div>
   <%});%>
 
-    <%} else {%>
-    <p>Not logged in</p>
-    <a href="/login">Login</a>
-    <a href="/signup">Register</a>
-    <%}%>
+  <%} else {%>
+  <p>Not logged in</p>
+  <a href="/login">Login</a>
+  <a href="/signup">Register</a>
+  <%}%>
   
 </body>
 </html>
