@@ -126,4 +126,31 @@ fileRouter.post("/:id/delete", async (req, res) => {
   res.redirect(`/files/folder/${file.parentId}`);
 });
 
+fileRouter.get("/:id/download", async (req, res) => {
+  // remove that file
+  const file = await prisma.file.findUnique({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
+
+  if (!file) {
+    return res.status(404).send('File not found');
+  }
+
+  console.log('sending file', file);
+  console.log(file.path, "exist?", fs.existsSync(file.path));
+  if (file.path && fs.existsSync(file.path)) {
+    // Set the appropriate headers for downloading
+    res.download(file.path, file.name, (err) => {
+      if (err) {
+        res.status(500).send('Error downloading the file');
+      }
+    });
+  } else {
+    res.status(404).send('File not found on the server');
+  }
+
+});
+
 module.exports = fileRouter;

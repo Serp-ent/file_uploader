@@ -40,14 +40,20 @@
     <button type="submit">Delete</button>
     </form>
 
+    <% if (file.type !== 'FOLDER') {%>
+    <form method="GET" action="/files/<%=file.id%>/download">
+      <button type="submit">download</button>
+    </form>
+    <%}%>
+
   </div>
   <%});%>
 
-  <%} else {%>
-  <p>Not logged in</p>
-  <a href="/login">Login</a>
-  <a href="/signup">Register</a>
-  <%}%>
+    <%} else {%>
+    <p>Not logged in</p>
+    <a href="/login">Login</a>
+    <a href="/signup">Register</a>
+    <%}%>
   
 </body>
 </html>
