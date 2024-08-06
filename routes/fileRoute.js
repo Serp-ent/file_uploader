@@ -33,29 +33,19 @@ fileRouter.post('/upload',
   }
 );
 
-fileRouter.post("/createFolder", async (req, res) => {
+fileRouter.post("/folder/:id/createFolder", async (req, res) => {
   const folderName = req.body.folderName;
-  const rootFolder = await prisma.file.findFirst({
-    where: {
-      userId: req.user.id,
-      type: "FOLDER",
-      parentId: null,
-    }
-  });
-
   const result = await prisma.file.create({
     data: {
       name: folderName,
       type: "FOLDER",
-      parentId: rootFolder.id,
+      parentId: Number(req.params.id),
       userId: req.user.id,
     }
   });
 
-  console.log('directory', result.name, "created");
-
-  // TODO: redirect user to display that folder
-  res.redirect('/');
+  // stay in the same folder
+  res.redirect(`/files/folder/${req.params.id}`);
 })
 
 // TODO: handle root id
