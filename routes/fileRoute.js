@@ -58,4 +58,24 @@ fileRouter.post("/createFolder", async (req, res) => {
   res.redirect('/');
 })
 
+// TODO: handle root id
+fileRouter.get('/folder', (req, res) => {
+
+})
+// TODO: authorize access to folders
+fileRouter.get('/folder/:id', async (req, res) => {
+  const directory = await prisma.file.findFirst({
+    where: {
+      id: Number(req.params.id),
+      type: 'FOLDER',
+    },
+    include: {
+      children: true,
+    }
+  });
+
+  console.log(directory);
+  res.render('index', { directory });
+})
+
 module.exports = fileRouter;

@@ -27,12 +27,13 @@
     <button type="submit">Upload</button>
   </form>
 
-  <% files.forEach(file => {%>
+  <h1>Directory: '<%=directory.name%>'</h1>
+  <% directory.children.forEach(file => {%>
   <div style="border: 1px solid black;">
     <h2><%= file.id %> <%= file.name %> <%= (file.type === 'FOLDER') ? 'DIRECTORY' : ""%></h2>
     Created at: <%= file.createdAt %>
     <% if (file.type === 'FOLDER') {%>
-    <a href="/folder/<%=file.id%>">Open</a>
+    <a href="/files/folder/<%=file.id%>">Open</a>
     <%}%>
   </div>
   <%});%>

@@ -34,26 +34,22 @@ const createUserPost = async (req, res) => {
 }
 
 const homePageGet = async (req, res) => {
-  res.locals.files = null;
+
   if (req.user) {
-    const rootFolder = await prisma.file.findFirst({
+    const directory = await prisma.file.findFirst({
       where: {
         userId: req.user.id,
         type: "FOLDER",
         parentId: null,
+      },
+      include: {
+        children: true,
       }
     });
-
-    res.locals.files = await prisma.file.findMany({
-      where: {
-        parentId: rootFolder.id,
-      }
-    });
-
-    console.log(res.locals.files);
+    res.render('index', { directory });
+  } else {
+    res.render('index', { directory: null });
   }
-
-  res.render('index');
 }
 
 const loginGet = (req, res) => {
