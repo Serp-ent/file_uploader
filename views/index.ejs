@@ -34,7 +34,10 @@
     Created at: <%= file.createdAt %>
     <% if (file.type === 'FOLDER') {%>
     <a href="/files/folder/<%=file.id%>">Open</a>
+    <%} else {%>
+    <a href="/files/<%=file.id%>">Info</a>
     <%}%>
+
 
     <form method="POST" action="/files/<%=file.id%>/delete">
     <button type="submit">Delete</button>

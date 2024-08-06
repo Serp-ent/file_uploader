@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File info</title>
+</head>
+
+<body>
+  <div>
+    <h1><%=file.name%></h1>
+    <p>created at: <%=file.createdAt %></p>
+  </div>
+
+  <a href="/files/folder/<%=file.parentId%>">Back</a>
+
+</body>
+
+</html>

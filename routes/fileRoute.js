@@ -7,6 +7,17 @@ const upload = multer({ dest: "uploads/" });
 const fileRouter = Router();
 // TODO: add authentication
 
+fileRouter.get('/:id', async (req, res) => {
+  const file = await prisma.file.findFirst({
+    where: {
+      id: Number(req.params.id),
+    }
+  });
+
+  console.log(file);
+  res.render('fileInfo', { file });
+})
+
 fileRouter.post('/upload',
   upload.single('file'),
   async (req, res) => {
