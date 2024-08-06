@@ -74,8 +74,35 @@ fileRouter.get('/folder/:id', async (req, res) => {
     }
   });
 
-  console.log(directory);
   res.render('index', { directory });
 })
+
+fileRouter.post('/folder/:id',
+  upload.single('file'),
+  async (req, res) => {
+    const userId = req.user.id;
+
+    const directory = await prisma.file.findFirst({
+      where: {
+        id: Number(req.params.id),
+        userId: userId,
+        type: "FOLDER",
+      }
+    });
+    console.log(directory);
+
+    const newItem = await prisma.file.create({
+      data: {
+        name: req.file.originalname,
+        userId,
+        parentId: directory.id,
+        path: req.file.path,
+        type: "FILE"
+      }
+    });
+
+    res.redirect(`/files/folder/${req.params.id}`);
+  }
+);
 
 module.exports = fileRouter;
