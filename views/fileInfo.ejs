@@ -13,6 +13,9 @@
     <p>created at: <%=file.createdAt %></p>
   </div>
 
+  <form method="GET" action="/files/<%=file.id%>/download">
+    <button type="submit">download</button>
+  </form>
   <a href="/files/folder/<%=file.parentId%>">Back</a>
 
 </body>

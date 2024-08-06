@@ -179,8 +179,7 @@ fileRouter.post('/share/:id', async (req, res) => {
       }
     });
 
-    const shareUrl = `https://localhost/share/${shareLink.linkId}`
-    res.json({ shareUrl });
+    res.redirect(`/files/share/${shareLink.linkId}`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error creating share link');
@@ -201,16 +200,16 @@ fileRouter.get('/share/:linkId', async (req, res) => {
     }
 
     // fetch folder contants
-    const folder = await prisma.file.findUnique({
+    const file = await prisma.file.findUnique({
       where: { id: shareLink.fileId },
       include: { children: true },
     });
 
-    if (!folder) {
-      return res.status(404).send('Folder not found');
+    if (!file) {
+      return res.status(404).send('File not found');
     }
 
-    res.json(folder);
+    res.render('fileInfo', { file });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error creating share link');
