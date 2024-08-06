@@ -9,6 +9,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = require('./db/prismaClient');
+const fileRouter = require('./routes/fileRoute');
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(session({
       checkPeriod: 2 * 60 * 1000,  //ms
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
-    }
+    },
   ),
 
 }))
@@ -70,6 +71,7 @@ passport.deserializeUser(async (id, done) => {
 })
 
 app.use('/', usersRoute);
+app.use('/files', fileRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
